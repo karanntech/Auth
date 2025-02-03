@@ -2,7 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import User from '../models/userSchema.js';
 
-export const register = async(req, res)=> {
+const register = async(req, res)=> {
     const {name, email, password} = req.body;
 
     if(!name || !email || !password){
@@ -27,13 +27,14 @@ export const register = async(req, res)=> {
             sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'strict',
             maxAge: 7*24*60*60*1000
         })
+        return res.json({success: true, message:"Logged In"})
 
     } catch (error) {
         res.json({success: false, message: error.message})
     }
 }
 
-export const login = async(req,res)=>{
+const login = async(req,res)=>{
     const {email, password} = req.body;
 
     if(!email || !password){
@@ -59,14 +60,14 @@ export const login = async(req,res)=>{
             maxAge: 7*24*60*60*1000
         });
 
-        return res.json({success: true, })
+        return res.json({success: true, message:"Logged In"})
 
     } catch (error) {
         res.json({success: false, message: error.message})
     }
 }
 
-export const logout = async(req, res)=>{
+const logout = async(req, res)=>{
     try {
         res.clearCookie('token',{
             httpOnly: true,
@@ -78,4 +79,10 @@ export const logout = async(req, res)=>{
     } catch (error) {
         res.json({success: false, message: error.message})
     }
+}
+
+export {
+    register,
+    login,
+    logout
 }
