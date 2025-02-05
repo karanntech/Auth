@@ -160,11 +160,21 @@ const verifyEmail = async(req, res)=>{
     }
 }
 
+//Check if user is authenticated
+const isAuthenticated = async(req, res)=>{
+    try {
+        return res.json({success: true})
+    } catch (error) {
+        res.json({success: false, message: error.message})
+    }
+}
+
 
 export {
     register,
     login,
     logout,
     sendVerifyOtp,
-    verifyEmail
+    verifyEmail,
+    isAuthenticated
 }
