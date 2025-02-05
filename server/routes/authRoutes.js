@@ -1,5 +1,6 @@
 import express from 'express';
-import { login, logout, register, sendVerifyOtp } from '../controllers/authController.js';
+import { login, logout, register, sendVerifyOtp, verifyEmail } from '../controllers/authController.js';
+import userAuth from '../middleware/userAuth.js';
 
 
 const router = express.Router();
@@ -10,6 +11,9 @@ router.post('/login', login);
 
 router.post('/logout', logout);
 
-router.post('/verify', sendVerifyOtp)
+router.post('/verify-otp', userAuth, sendVerifyOtp);
+
+router.post('/verify-account',userAuth, verifyEmail);
+
 
 export default router;

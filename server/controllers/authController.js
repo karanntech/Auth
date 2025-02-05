@@ -99,7 +99,6 @@ const sendVerifyOtp = async(req, res)=>{
 
     try {
         const {userId} = req.body;
-
         const user = await User.findById(userId);
 
         if(user.isAccountVerified){
@@ -121,7 +120,7 @@ const sendVerifyOtp = async(req, res)=>{
 
         await transporter.sendMail(mailOption);
         
-        res.json({success: true, message: "Verification OTP Sent to your Email"})
+        return res.json({success: true, message: "Verification OTP Sent to your Email"})
 
     } catch (error) {
         res.json({success: false, message: error.message})
@@ -131,21 +130,21 @@ const sendVerifyOtp = async(req, res)=>{
 const verifyEmail = async(req, res)=>{
     const {userId, otp} = req.body;
     if(!userId || !otp){
-        res.json({success: false, message: 'Missing Details'})
+        return res.json({success: false, message: 'Invalid OTP'})
     }
 
     try {
         const user = await User.findById(userId);
         if(!user){
-            res.json({success: false, message: 'User not found'})
+           return res.json({success: false, message: 'User not found'})
         }
 
         if(user.verifyOtp === '' || user.verifyOtp !== otp){
-            res.json({success: false, message: "Invalid OTP"})
+           return res.json({success: false, message: "Invalid OTP"})
         }
 
         if(user.verifyOtpExpiresAt < Date.now()){
-            res.json({success: false, message: 'OTP Expired'})
+          return res.json({success: false, message: 'OTP Expired'})
         }
 
         user.isAccountVerified = true;
@@ -154,7 +153,7 @@ const verifyEmail = async(req, res)=>{
 
         await user.save();
 
-        res.json({success: true, message: "Email verified successfully"})
+        return res.json({success: true, message: "Email verified successfully"})
 
     } catch (error) {
         res.json({success: false, message: error.message})
