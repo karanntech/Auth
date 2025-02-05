@@ -93,8 +93,79 @@ const logout = async(req, res)=>{
     }
 }
 
+//Send verification email to the User's email
+
+const sendVerifyOtp = async(req, res)=>{
+
+    try {
+        const {userId} = req.body;
+
+        const user = await User.findById(userId);
+
+        if(user.isAccountVerified){
+            return res.json({success: false, message: "Account already verified"})
+        }
+
+        const otp = String(Math.floor(100000 + Math.random()*900000));
+        user.verifyOtp = otp;
+        user.verifyOtpExpiresAt = Date.now() + 24 * 60 * 60 * 1000;
+
+        await user.save();
+
+        const mailOption = {
+            from: process.env.SENDER_EMAIL,
+            to: user.email,
+            subject: "Account Verification OTP",
+            text: `Your OTP is ${otp}. Verify your account using this OTP.`
+        }
+
+        await transporter.sendMail(mailOption);
+        
+        res.json({success: true, message: "Verification OTP Sent to your Email"})
+
+    } catch (error) {
+        res.json({success: false, message: error.message})
+    }
+}
+
+const verifyEmail = async(req, res)=>{
+    const {userId, otp} = req.body;
+    if(!userId || !otp){
+        res.json({success: false, message: 'Missing Details'})
+    }
+
+    try {
+        const user = await User.findById(userId);
+        if(!user){
+            res.json({success: false, message: 'User not found'})
+        }
+
+        if(user.verifyOtp === '' || user.verifyOtp !== otp){
+            res.json({success: false, message: "Invalid OTP"})
+        }
+
+        if(user.verifyOtpExpiresAt < Date.now()){
+            res.json({success: false, message: 'OTP Expired'})
+        }
+
+        user.isAccountVerified = true;
+        user.verifyOtp = '';
+        user.verifyOtpExpiresAt = 0;
+
+        await user.save();
+
+        res.json({success: true, message: "Email verified successfully"})
+
+    } catch (error) {
+        res.json({success: false, message: error.message})
+    }
+}
+
+
 export {
     register,
     login,
-    logout
+    logout,
+    sendVerifyOtp,
+    verifyEmail
 }
