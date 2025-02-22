@@ -6,7 +6,7 @@ const Login = () => {
   
   const [state, setState] = useState('Sign Up')
   return (
-    <div className='flex items-center justify-center'>
+    <div className='flex items-center justify-center min-h-screen px-6 sm:px-0'>
         <img src={assets.logo} alt="" className='absolute left-5 sm:left-20 top-5 w-28 sm:w-32 cursor-pointer' />
         <div>
           <h2>{state === 'Sign Up' ? 'Create account' : 'Login'}</h2>
